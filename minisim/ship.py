@@ -6,6 +6,9 @@ class Ship:
         self.state = ShipState()
 
     def step(self , dt):
+        turn_accel = 1.5 * self.state.rubber - 0.8 * self.state.turn_rate
+        self.state.turn_rate = self.state.turn_rate + dt * turn_accel
+
         self.state.heading = self.state.heading + dt * self.state.turn_rate
 
         vx = self.state.speed * math.cos(self.state.heading)

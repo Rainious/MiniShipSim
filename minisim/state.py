@@ -7,3 +7,4 @@ class ShipState:
     speed: float = 0.0
     heading: float = 0.0
     turn_rate: float = 0.0
+    rubber: float = 0.0
