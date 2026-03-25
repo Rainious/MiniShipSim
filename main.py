@@ -1,19 +1,26 @@
 from minisim.ship import Ship
+from minisim.simulator import Simulator
+from minisim.render.plot2d import plot_trajectory
 
 def main():
     ship = Ship()
 
     ship.state.speed = 2.0
     ship.state.rudder = 0.5
+    
+    sim = Simulator(ship)
+    sim.run(0.1, 20)
 
-    for i in range(20):
-        ship.step(0.1)
-        print("step", i)
-        print("x = ", ship.state.x)
-        print("y = ", ship.state.y)
-        print("heading = ", ship.state.heading)
-        print("turn_rate = ", ship.state.turn_rate)
-        print("Ipad lg2 test.")
+    for item in sim.history:
+        print(f"time = {item['time']:.1f}")
+        print(f"x = {item['x']:.3f}")
+        print(f"y = {item['y']:.3f}")
+        print(f"heading = {item['heading']:.3f}")
+        print(f"turn_rate = {item['turn_rate']:.3f}")
+        print()
+        
+    plot_trajectory(sim.history)
+
 
 
 if __name__ == "__main__":
