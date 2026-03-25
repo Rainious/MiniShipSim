@@ -1,15 +1,21 @@
 from minisim.ship import Ship
 from minisim.simulator import Simulator
 from minisim.render.plot2d import plot_trajectory
+from minisim.render.plot2d import plot_state_history
+from minisim.control.command import ControlCommand
+
+import math
 
 def main():
     ship = Ship()
 
     ship.state.speed = 2.0
-    ship.state.rudder = 0.5
+    
+    command = ControlCommand()
+    command.rudder = 0.5
     
     sim = Simulator(ship)
-    sim.run(0.1, 20)
+    sim.run(0.1, 20, command)
 
     for item in sim.history:
         print(f"time = {item['time']:.1f}")
@@ -20,6 +26,7 @@ def main():
         print()
         
     plot_trajectory(sim.history)
+    plot_state_history(sim.history)
 
 
 

@@ -17,3 +17,26 @@ def plot_trajectory(history):
 	plt.grid(True)
 	plt.savefig("tra.png", dpi=150)
 	plt.show()
+	plt.close
+
+def plot_state_history(history):
+	ts = []
+	headings = []
+	turn_rates = []
+	
+	for item in history:
+		ts.append(item["time"])
+		headings.append(item["heading"])
+		turn_rates.append(item["turn_rate"])
+
+	plt.figure()
+	plt.plot(ts, headings, label="heading")
+	plt.plot(ts, turn_rates, label="turn_rate")
+	plt.xlabel("time")
+	plt.ylabel("value")
+	plt.title("State History")
+	plt.grid(True)
+	plt.legend()
+	plt.savefig("state.png", dpi=150)
+	plt.show()
+	plt.close()

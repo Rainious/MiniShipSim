@@ -18,13 +18,22 @@ class Simulator:
 			}
 		
 		)
+
+	def apply_command(self, command):
+		self.ship.state.rudder = command.rudder
 		
-	def step(self, dt):
+	def step(self, dt, command=None):
+		if command is not None:
+			self.apply_command(command)
+
 		self.ship.step(dt)#使用ship的step方法更新ship的状态
 		self.time = self.time + dt
 		self.record()
 		
-	def run(self, dt, steps):
+	def run(self, dt, steps, command=None):
+		if command is not None:
+			self.apply_command(command)
+
 		self.record()
 		for _ in range(steps):
-			self.step(dt)
+			self.step(dt, command)
