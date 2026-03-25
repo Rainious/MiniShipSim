@@ -13,6 +13,7 @@ def main():
         print("y = ", ship.state.y)
         print("heading = ", ship.state.heading)
         print("turn_rate = ", ship.state.turn_rate)
+        print("Ipad lg2 test.")
 
 
 if __name__ == "__main__":
