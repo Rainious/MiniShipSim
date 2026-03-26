@@ -12,6 +12,7 @@ def plot_trajectory(history):
 	plt.plot(xs, ys, label="trajectory")
 	plt.plot(xs[0], ys[0], "go", label="start")
 	plt.plot(xs[-1], ys[-1], "ro", label="end")
+
 	plt.xlabel("x")
 	plt.ylabel("y")
 	plt.title("Ship Trajectory")
@@ -22,6 +23,9 @@ def plot_trajectory(history):
 	plt.show()
 	plt.close
 
+#TODO:
+#command is applied at step start, while state is recorded at step end.
+#This can make control signal tansitions appear shifted in plots.
 def plot_state_history(history):
 	ts = []
 	headings = []
@@ -37,7 +41,8 @@ def plot_state_history(history):
 	plt.figure()
 	plt.plot(ts, headings, label="heading")
 	plt.plot(ts, turn_rates, label="turn_rate")
-	plt.plot(ts, rudders, label="rudder")
+	plt.step(ts, rudders, where="post", label="rudder")
+
 	plt.xlabel("time")
 	plt.ylabel("value")
 	plt.title("State History")
