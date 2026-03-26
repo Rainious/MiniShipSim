@@ -37,7 +37,7 @@ def plot_state_history(history):
 	plt.figure()
 	plt.plot(ts, headings, label="heading")
 	plt.plot(ts, turn_rates, label="turn_rate")
-	plt.plot(ts, rudders, lable="rudder")
+	plt.plot(ts, rudders, label="rudder")
 	plt.xlabel("time")
 	plt.ylabel("value")
 	plt.title("State History")
