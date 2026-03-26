@@ -13,7 +13,6 @@ def main():
     
     command = ControlCommand()
     
-    
     sim = Simulator(ship)
     
     for i in range(30):
