@@ -12,10 +12,16 @@ def main():
     ship.state.speed = 2.0
     
     command = ControlCommand()
-    command.rudder = 0.5
+    
     
     sim = Simulator(ship)
-    sim.run(0.1, 20, command)
+    
+    for i in range(30):
+        if i < 10:
+            command.rudder = 0
+        else:
+            command.rudder = 0.5
+        sim.step(0.1, command)
 
     for item in sim.history:
         print(f"time = {item['time']:.1f}")

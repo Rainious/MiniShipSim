@@ -7,14 +7,17 @@ def plot_trajectory(history):
 	for item in history:
 		xs.append(item["x"])
 		ys.append(item["y"])
-		
+	
 	plt.figure()
-	plt.plot(xs, ys)
+	plt.plot(xs, ys, label="trajectory")
+	plt.plot(xs[0], ys[0], "go", label="start")
+	plt.plot(xs[-1], ys[-1], "ro", label="end")
 	plt.xlabel("x")
 	plt.ylabel("y")
 	plt.title("Ship Trajectory")
 	plt.axis("equal")
 	plt.grid(True)
+	plt.legend()
 	plt.savefig("tra.png", dpi=150)
 	plt.show()
 	plt.close
@@ -23,15 +26,18 @@ def plot_state_history(history):
 	ts = []
 	headings = []
 	turn_rates = []
+	rudders = []
 	
 	for item in history:
 		ts.append(item["time"])
 		headings.append(item["heading"])
 		turn_rates.append(item["turn_rate"])
+		rudders.append(item["rudder"])
 
 	plt.figure()
 	plt.plot(ts, headings, label="heading")
 	plt.plot(ts, turn_rates, label="turn_rate")
+	plt.plot(ts, rudders, lable="rudder")
 	plt.xlabel("time")
 	plt.ylabel("value")
 	plt.title("State History")
