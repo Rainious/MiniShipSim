@@ -31,17 +31,20 @@ def plot_state_history(history):
 	headings = []
 	turn_rates = []
 	rudders = []
+	speeds = []
 	
 	for item in history:
 		ts.append(item["time"])
 		headings.append(item["heading"])
 		turn_rates.append(item["turn_rate"])
 		rudders.append(item["rudder"])
+		speeds.append(item["speed"])
 
 	plt.figure()
 	plt.plot(ts, headings, label="heading")
 	plt.plot(ts, turn_rates, label="turn_rate")
 	plt.step(ts, rudders, where="post", label="rudder")
+	plt.step(ts, speeds, where ="post", label="speed")
 
 	plt.xlabel("time")
 	plt.ylabel("value")

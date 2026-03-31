@@ -4,6 +4,12 @@ from minisim.control.command import ControlCommand
 from minisim.simulator import Simulator
 from minisim.ship import Ship
 
+DT = 0.1
+RUDDER_STEP = 0.03
+RUDDER_RETURN_RATE = 0.015
+SPEED_STEP = 0.05
+MAX_RUDDER = 0.3
+MAX_SPEED = 2.0
 WIDTH = 800
 HEIGHT = 600
 PIX_PER_METER = 20
@@ -51,35 +57,37 @@ def draw_trajectory(screen, history, cam_x, cam_y):
 def key_control():
     keys = pygame.key.get_pressed()
     if keys[pygame.K_LEFT]:
-        kcommand.rudder -= 0.03
+        kcommand.rudder -= RUDDER_STEP
     else :
         if keys[pygame.K_RIGHT]:
-            kcommand.rudder += 0.03
+            kcommand.rudder += RUDDER_STEP
         else:
-            if keys[pygame.K_UP]:
-                kcommand.speed += 0.05
+            if kcommand.rudder > 0:
+                kcommand.rudder -= RUDDER_RETURN_RATE
+            		if kcommand.rudder < 0:
+                		kcommand.rudder = 0
             else:
-                if keys[pygame.K_DOWN]:
-                    kcommand.speed -= 0.05
-                else:
-                    if kcommand.rudder > 0:
-                        kcommand.rudder -= 0.015
-                        if kcommand.rudder < 0:
-                            kcommand.rudder = 0
-                    else:
-                        if kcommand.rudder < 0:
-                            kcommand.rudder += 0.015
-                            if kcommand.rudder > 0:
-                                kcommand.rudder = 0
+                if kcommand.rudder < 0:
+                    kcommand.rudder += RUDDER_RETURN_RATE
+                		if kcommand.rudder > 0:
+                    		kcommand.rudder = 0
+            
+    
+    if keys[pygame.K_UP]:
+        kcommand.speed += SPEED_STEP
+    else:
+        if keys[pygame.K_DOWN]:
+            kcommand.speed -= SPEED_STEP
+
 
     if kcommand.speed < 0 :
         kcommand.speed = 0
-    if kcommand.speed > 2:
-        kcommand.speed = 2
-    if kcommand.rudder < -0.3:
-        kcommand.rudder = -0.3
-    if kcommand.rudder > 0.3:
-        kcommand.rudder = 0.3
+    if kcommand.speed > MAX_SPEED:
+        kcommand.speed = MAX_SPEED
+    if kcommand.rudder < - MAX_RUDDER:
+        kcommand.rudder = - MAX_RUDDER
+    if kcommand.rudder > MAX_RUDDER:
+        kcommand.rudder = MAX_RUDDER
         
 
 
@@ -111,7 +119,7 @@ def main():
         key_control()
 
             
-        ksim.step(0.1, kcommand)
+        ksim.step(DT, kcommand)
 
         cam_x = kship.state.x
         cam_y = kship.state.y

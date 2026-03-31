@@ -2,7 +2,7 @@ from minisim.ship import Ship
 from minisim.simulator import Simulator
 from minisim.render.plot2d import plot_trajectory, plot_state_history
 from minisim.control.command import ControlCommand
-from minisim.control.scripts import rudder_step_script
+from minisim.control.scripts import rudder_step_script, speed_step_script
 
 import math
 
@@ -20,6 +20,7 @@ def main():
     
     for i in range(30):
         command.rudder = rudder_step_script(i)
+        command.speed = speed_step_script(i)
         sim.step(dt, command)
 
     for item in sim.history:
