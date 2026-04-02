@@ -21,7 +21,8 @@ class Simulator:
 
 	def apply_command(self, command):
 		self.ship.state.rudder = command.rudder
-		self.ship.state.speed = command.speed
+		self.ship.state.target_speed = command.t_speed
+	
 		
 	def step(self, dt, command=None):
 		if command is not None:

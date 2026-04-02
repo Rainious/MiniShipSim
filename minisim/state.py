@@ -8,3 +8,4 @@ class ShipState:
     heading: float = 0.0
     turn_rate: float = 0.0
     rudder: float = 0.0
+    target_speed: float = 0.0

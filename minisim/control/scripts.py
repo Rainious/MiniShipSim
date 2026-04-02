@@ -1,3 +1,6 @@
+def rudder_straight(step_index):
+    return 0
+
 def rudder_step_script(step_index):
     if step_index < 10:
         return 0.1
@@ -41,4 +44,8 @@ def speed_hold_then_drop(step_index):
         return 1.0
     else:
         return 0.5
+        
+        
+def target_speed_straight(step_index):
+    return 3.0
             
