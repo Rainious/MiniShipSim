@@ -5,8 +5,8 @@ from minisim.simulator import Simulator
 from minisim.ship import Ship
 
 DT = 0.1
-RUDDER_STEP = 0.03
-RUDDER_RETURN_RATE = 0.015
+RUDDER_STEP = 0.005
+RUDDER_RETURN_RATE = 0.0025
 SPEED_STEP = 0.05
 MAX_RUDDER = 0.3
 MAX_SPEED = 2.0
@@ -64,26 +64,26 @@ def key_control():
         else:
             if kcommand.rudder > 0:
                 kcommand.rudder -= RUDDER_RETURN_RATE
-            		if kcommand.rudder < 0:
-                		kcommand.rudder = 0
+                if kcommand.rudder < 0:
+                    kcommand.rudder = 0
             else:
                 if kcommand.rudder < 0:
                     kcommand.rudder += RUDDER_RETURN_RATE
-                		if kcommand.rudder > 0:
-                    		kcommand.rudder = 0
+                    if kcommand.rudder > 0:
+                        kcommand.rudder = 0
             
     
     if keys[pygame.K_UP]:
-        kcommand.speed += SPEED_STEP
+        kcommand.target_speed += SPEED_STEP
     else:
         if keys[pygame.K_DOWN]:
-            kcommand.speed -= SPEED_STEP
+            kcommand.target_speed -= SPEED_STEP
 
 
-    if kcommand.speed < 0 :
-        kcommand.speed = 0
-    if kcommand.speed > MAX_SPEED:
-        kcommand.speed = MAX_SPEED
+    if kcommand.target_speed < 0 :
+        kcommand.target_speed = 0
+    if kcommand.target_speed > MAX_SPEED:
+        kcommand.target_speed = MAX_SPEED
     if kcommand.rudder < - MAX_RUDDER:
         kcommand.rudder = - MAX_RUDDER
     if kcommand.rudder > MAX_RUDDER:
@@ -96,7 +96,7 @@ def main():
 
 
     kcommand.rudder = 0.0
-    kcommand.speed = 0.0
+    kcommand.target_speed = 0.0
 
 
     pygame.init()
@@ -131,9 +131,11 @@ def main():
         draw_trajectory(screen, ksim.history, cam_x, cam_y)
 
         rudder_text = font.render(f"rudder = {kcommand.rudder:.2f}", True, (255,255,255))
-        speed_text = font.render(f"speed = {kcommand.speed:.2f}", True, (255,255,255))
+        speed_text = font.render(f"speed = {kship.state.speed:.2f}", True, (255,255,255))
+        t_speed_text = font.render(f"target_speed = {kcommand.target_speed:.2f}", True, (255,255,255))
         screen.blit(rudder_text, (20, 20))
         screen.blit(speed_text, (20, 50))
+        screen.blit(t_speed_text, (20, 80))
 
         pygame.display.flip()
 

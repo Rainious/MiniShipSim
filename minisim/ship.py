@@ -8,7 +8,7 @@ class Ship:
         
         
     def speed_cal(self, dt):
-        k = 1.2
+        k = 0.3
         speed_dot = k * (self.state.target_speed - self.state.speed)
         self.state.speed = self.state.speed + dt * speed_dot
         

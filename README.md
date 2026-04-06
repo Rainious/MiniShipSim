@@ -1,77 +1,117 @@
 # MiniShipSim
 
-MiniShipSim is a small Python toy project for simulating a ship-like point mass moving in 2D.
-It provides two runnable modes:
+MiniShipSim is a Python ship maneuvering simulation project that starts from a minimal 2D prototype and gradually evolves toward a more modular and expressive simulator.
 
-- An **offline step-based simulation** that runs a scripted control sequence and plots results with matplotlib.
-- A **pygame real-time keyboard demo** for manually steering the ship on screen.
+At its current stage, the project focuses on building a runnable simulation core rather than a physically accurate ship model. It already supports:
 
-This project is currently minimal and intentionally focused on making a runnable prototype rather than a physically accurate model.
+- an **offline scripted simulation** with matplotlib plots;
+- a **pygame real-time keyboard demo** for interactive steering experiments.
+
+The long-term goal is to keep improving the structure, control flow, and physical modeling step by step, so that this project can gradually grow from a small prototype into a clearer ship maneuvering simulation framework.
+
+---
+
+## Current Status
+
+MiniShipSim is still an early-stage prototype, but the main loop is already working:
+
+- scripted rudder / target-speed inputs can drive offline runs;
+- simulation history can be recorded and visualized;
+- a real-time pygame demo can steer the ship interactively;
+- the project already has a core package structure (`state`, `ship`, `simulator`, `control`, `render`) that can be extended later.
+
+In short: **the project is no longer just a single test script — it is becoming a small simulation project with a usable core loop.**
 
 ---
 
 ## Implemented Features
 
-- **Ship state** (`x`, `y`, `speed`, `heading`, `turn_rate`, `rudder`, `target_speed`) defined as a dataclass.
-- **Simplified ship dynamics** (`Ship.step`):
-  - Speed approaches `target_speed` with a first-order response.
-  - Heading/turn rate evolves based on rudder input and turn-rate damping.
-  - Position integrated from speed and heading.
-- **Simulator with history recording** (`Simulator`):
-  - Accepts a `ControlCommand` each step (rudder + target speed).
-  - Appends a state snapshot to `history` after every step.
-- **Offline plotting** (matplotlib):
-  - Trajectory plot saved as `tra.png`.
-  - State history (heading, turn rate, rudder, speed vs time) saved as `state.png`.
-- **Predefined control scripts** for offline runs (straight, step, S-turn, ramp, etc.).
-- **Real-time pygame demo**:
-  - Arrow key control of rudder and speed.
-  - Draws ship as a triangle with a live trajectory trail.
-  - HUD showing current rudder and speed values.
+### Core State and Simulation
+- **Ship state** stored in `ShipState`
+  - `x`, `y`
+  - `speed`
+  - `heading`
+  - `turn_rate`
+  - `rudder`
+  - `target_speed`
+- **Simplified ship dynamics** in `Ship.step(...)`
+  - speed approaches `target_speed` through a first-order response;
+  - turn rate evolves from rudder input with damping;
+  - heading is integrated from turn rate;
+  - position is integrated from speed and heading.
+- **Simulator with history recording**
+  - accepts a `ControlCommand` each step;
+  - applies control inputs before state update;
+  - records simulation history over time.
+
+### Offline Simulation
+- **Offline runner** in `main.py`
+- **Scripted control inputs** in `minisim/control/scripts.py`
+- **Matplotlib output**
+  - `tra.png` — trajectory plot
+  - `state.png` — state history plot
+
+### Real-Time Demo
+- **pygame keyboard demo** in `examples/realtime_keyboard.py`
+- Keyboard control of rudder and target speed
+- Ship drawn as a triangle
+- Live trajectory trail
+- HUD showing:
+  - current rudder
+  - current speed
+  - current target speed
 
 ---
 
 ## Project Structure
 
-```
+```text
 MiniShipSim/
 ├── main.py                         # Offline simulation entry point
 ├── requirements.txt
+├── README.md
 ├── data/                           # Reserved for future data/config files
 ├── examples/
 │   ├── realtime_keyboard.py        # Pygame real-time demo entry point
-│   └── demo_turning.py             # (empty placeholder)
+│   └── demo_turning.py             # Placeholder
 └── minisim/                        # Core package
+    ├── __init__.py
     ├── state.py                    # ShipState dataclass
-    ├── ship.py                     # Ship dynamics (step, speed_cal, heading_cal, pos_cal)
+    ├── ship.py                     # Ship dynamics
     ├── simulator.py                # Simulation loop + history recording
-    ├── config.py                   # (reserved)
+    ├── config.py                   # Reserved for future configuration
     ├── control/
+    │   ├── __init__.py
     │   ├── command.py              # ControlCommand dataclass
-    │   └── scripts.py              # Predefined rudder/speed scripts for offline runs
+    │   └── scripts.py              # Predefined offline rudder / target-speed scripts
     ├── render/
-    │   └── plot2d.py               # matplotlib trajectory and state-history plots
-    ├── physics/                    # (placeholder modules, currently empty)
+    │   ├── __init__.py
+    │   └── plot2d.py               # Matplotlib plotting helpers
+    ├── physics/                    # Placeholder modules
+    │   ├── __init__.py
     │   ├── drag.py
     │   ├── propulsion.py
     │   └── steering.py
     └── world/
-        └── environment.py          # (placeholder, currently empty)
+        ├── __init__.py
+        └── environment.py          # Placeholder
 ```
 
 ---
 
 ## Installation
 
-Create a virtual environment (optional but recommended), then install:
+Create a virtual environment if you want, then install dependencies:
 
 ```bash
 pip install -r requirements.txt
 ```
 
-> **Notes:**
-> - `pygame` may require additional system packages on some Linux setups (e.g. `libsdl2`).
-> - If you only want to run the offline matplotlib simulation, `matplotlib` alone is sufficient.
+Current runtime dependencies are intentionally minimal.
+
+> Notes:
+> - `pygame` may require additional system packages on some Linux environments.
+> - If you only want to run the offline simulation, `matplotlib` is the key dependency.
 
 ---
 
@@ -83,16 +123,25 @@ From the repository root:
 python main.py
 ```
 
-What happens:
-1. Runs a 45-step simulation (dt = 0.1 s) with straight-ahead rudder and constant target speed.
-2. Prints the state history (time, x, y, heading, turn rate, rudder, speed) to the console.
-3. Opens matplotlib windows and saves:
-   - `tra.png` — 2D trajectory (start marked green, end marked red).
-   - `state.png` — time-series plot of heading, turn rate, rudder, and speed.
+What it currently does:
+1. runs a scripted offline simulation;
+2. prints recorded state history to the console;
+3. generates:
+   - `tra.png` — trajectory plot
+   - `state.png` — state history plot
+
+At the moment, the default `main.py` setup runs:
+
+- `dt = 0.1`
+- `steps = 45`
+- `rudder_straight`
+- `target_speed_straight`
+
+You can change the selected control scripts in `main.py` to try different offline experiments.
 
 ---
 
-## Run the Pygame Real-time Demo
+## Run the Real-Time Keyboard Demo
 
 From the repository root:
 
@@ -100,45 +149,91 @@ From the repository root:
 python examples/realtime_keyboard.py
 ```
 
-**Keyboard controls:**
+### Keyboard Controls
 
-| Key         | Action                                      |
-|-------------|---------------------------------------------|
-| ← Left      | Decrease rudder (turn left)                 |
-| → Right     | Increase rudder (turn right)                |
-| ↑ Up        | Increase speed                              |
-| ↓ Down      | Decrease speed                              |
-| (no key)    | Rudder auto-returns toward 0 gradually      |
+| Key | Action |
+|---|---|
+| ← Left | Decrease rudder |
+| → Right | Increase rudder |
+| ↑ Up | Increase target speed |
+| ↓ Down | Decrease target speed |
+| No left/right input | Rudder gradually returns toward 0 |
 
-The screen shows the ship (triangle), its trajectory trail, and current rudder/speed values.
+The pygame window currently shows:
+- the ship as a triangle,
+- its trajectory trail,
+- current rudder,
+- current speed,
+- current target speed.
 
----
-
-## Example Output Images
-
-The repo root currently contains two images generated by a previous run of `main.py`:
-
-- **`tra.png`** — trajectory plot output from `minisim/render/plot2d.py → plot_trajectory()`.
-- **`state.png`** — state history plot output from `minisim/render/plot2d.py → plot_state_history()`.
-
-These are **runtime-generated files**, not source assets. They are included here as example output.
-Running `main.py` will overwrite them. See [Known Limitations / TODO](#known-limitations--todo) for a note on moving outputs out of the root in the future.
+This mode is currently a lightweight interactive demo rather than a polished simulation UI.
 
 ---
 
-## Known Limitations / TODO
+## Example Output
 
-- The dynamics model is highly simplified (first-order speed response, linear rudder-to-turn-rate model) and not physically accurate.
-- `minisim/physics/` (`drag.py`, `propulsion.py`, `steering.py`) and `minisim/world/environment.py` exist as placeholder files with no implementation yet.
-- `minisim/config.py` and `examples/demo_turning.py` are also currently empty placeholders.
-- Offline plots (`tra.png`, `state.png`) are saved to the repository root directory (wherever the script is run from). A future improvement would be to save them to a dedicated `outputs/` subdirectory.
-- In `plot_state_history`, the command is applied at step start while state is recorded at step end, which can make control signal transitions appear slightly shifted in plots (noted as a TODO in the code).
-- No license file is included. Consider adding one (e.g. MIT) if you plan to keep this repository public.
+The repository root currently contains example output images generated by the offline simulation:
+
+- `tra.png` — trajectory plot
+- `state.png` — state history plot
+
+These are **generated runtime outputs**, not source assets.  
+Running `main.py` may overwrite them.
 
 ---
 
-## GitHub About
+## Current Model Notes
 
-**Description:** A minimal Python toy ship simulator with offline matplotlib plotting and a pygame real-time keyboard demo.
+The current model is intentionally simple:
 
-**Topics:** `python`, `simulation`, `2d`, `pygame`, `matplotlib`, `control`, `toy-project`
+- `rudder` acts as a control input;
+- `target_speed` acts as a commanded speed target;
+- `speed` is a simulated response that gradually approaches `target_speed`;
+- `turn_rate`, `heading`, `x`, and `y` are evolved step by step from the current state.
+
+This means the project is already moving beyond “directly set speed and position,” but it is still far from a realistic ship dynamics model.
+
+---
+
+## Current Limitations
+
+MiniShipSim is still a prototype. Important limitations at the moment include:
+
+- The physics model is highly simplified and not intended to be physically accurate.
+- Command naming for target speed is now unified as `target_speed` across the control path.
+- `minisim/physics/`, `minisim/world/`, `minisim/config.py`, and `examples/demo_turning.py` are still placeholders.
+- Offline output images are still saved into the repository root.
+- In plotting, control application time and recorded state time are not yet fully separated, so command transitions may appear slightly shifted.
+- The real-time pygame mode is a demo, not yet a full simulation application.
+
+---
+
+## Roadmap Direction
+
+The project is gradually moving toward:
+
+- clearer separation between command, state, and physics;
+- richer offline experiment workflows;
+- more complete ship / environment modeling;
+- better visualization and control structure;
+- a more modular ship maneuvering simulator rather than a single prototype script.
+
+This roadmap is directional, not a claim that all of these features already exist.
+
+---
+
+## License
+
+No license file is included yet.
+
+If this repository is intended to stay public, adding a license such as **MIT** would make reuse and collaboration much clearer.
+
+---
+
+## Suggested GitHub About
+
+**Description**  
+A Python ship maneuvering simulation project, evolving from a minimal 2D prototype toward a more modular and expressive simulator.
+
+**Topics**  
+`python`, `simulation`, `ship`, `maneuvering`, `2d`, `pygame`, `matplotlib`, `control`

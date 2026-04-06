@@ -16,7 +16,7 @@ def run_offline_sim(dt, steps, rudder_script, speed_script):
     
     for i in range(steps):
         command.rudder = rudder_script(i)
-        command.t_speed = speed_script(i)
+        command.target_speed = speed_script(i)
         sim.step(dt, command)
         
     return sim
