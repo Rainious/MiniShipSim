@@ -209,3 +209,4 @@ __marimo__/
 # MiniShipSim generated outputs (images produced by main.py / plot2d.py)
 tra.png
 state.png
+outputs/

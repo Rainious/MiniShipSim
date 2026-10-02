@@ -10,7 +10,14 @@ class Ship:
     def speed_cal(self, dt):
         k = 0.3
         speed_dot = k * (self.state.target_speed - self.state.speed)
-        self.state.speed = self.state.speed + dt * speed_dot
+        self.state.speed_accel = speed_dot
+        self.state.speed = self.state.speed + dt * self.state.speed_accel
+
+
+    def rudder_cal(self, dt):
+        k = 2.0
+        rudder_dot = k * (self.state.target_rudder - self.state.rudder)
+        self.state.rudder = self.state.rudder + dt * rudder_dot
         
         
     def heading_cal(self, dt):
@@ -25,11 +32,13 @@ class Ship:
 
         self.state.x = self.state.x + dt * vx
         self.state.y = self.state.y + dt * vy
+
         
 
     def step(self, dt):
         
         self.speed_cal(dt)
+        self.rudder_cal(dt)
         self.heading_cal(dt)
         self.pos_cal(dt)
 

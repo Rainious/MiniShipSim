@@ -1,0 +1,238 @@
+{
+  "object": "Hull",
+  "frames": {
+    "blender_native": "+X bow, +Y port, +Z up; origin on the still-water line amidships",
+    "obj_export": "identity (forward_axis='Y', up_axis='Z') -- same as Blender native"
+  },
+  "principal": {
+    "loa": 4.0,
+    "beam": 1.5,
+    "draft": 0.28,
+    "freeboard": 0.495,
+    "depth": 0.775
+  },
+  "stations_x": [
+    -2.0,
+    -1.5,
+    -1.0,
+    -0.4,
+    0.4,
+    1.0,
+    1.5,
+    1.8,
+    2.0
+  ],
+  "half_beam": [
+    0.03,
+    0.6032,
+    0.7097,
+    0.7493,
+    0.7168,
+    0.635,
+    0.5104,
+    0.3742,
+    0.03
+  ],
+  "keel_half": [
+    0.02,
+    0.0844,
+    0.0994,
+    0.1049,
+    0.1003,
+    0.0889,
+    0.0715,
+    0.0524,
+    0.02
+  ],
+  "sections": [
+    {
+      "x": -2.0,
+      "half_beam": 0.03,
+      "keel_half": 0.02,
+      "keel_z": -0.28,
+      "deck_z": 0.42,
+      "rail_z": 0.0,
+      "reflex_vertices": 0
+    },
+    {
+      "x": -1.5,
+      "half_beam": 0.6032,
+      "keel_half": 0.0844,
+      "keel_z": -0.2791,
+      "deck_z": 0.4212,
+      "rail_z": 0.0,
+      "reflex_vertices": 0
+    },
+    {
+      "x": -1.0,
+      "half_beam": 0.7097,
+      "keel_half": 0.0994,
+      "keel_z": -0.2763,
+      "deck_z": 0.4247,
+      "rail_z": 0.0,
+      "reflex_vertices": 0
+    },
+    {
+      "x": -0.4,
+      "half_beam": 0.7493,
+      "keel_half": 0.1049,
+      "keel_z": -0.2704,
+      "deck_z": 0.432,
+      "rail_z": 0.0,
+      "reflex_vertices": 0
+    },
+    {
+      "x": 0.4,
+      "half_beam": 0.7168,
+      "keel_half": 0.1003,
+      "keel_z": -0.2584,
+      "deck_z": 0.447,
+      "rail_z": 0.0,
+      "reflex_vertices": 0
+    },
+    {
+      "x": 1.0,
+      "half_beam": 0.635,
+      "keel_half": 0.0889,
+      "keel_z": -0.2463,
+      "deck_z": 0.4622,
+      "rail_z": 0.0,
+      "reflex_vertices": 0
+    },
+    {
+      "x": 1.5,
+      "half_beam": 0.5104,
+      "keel_half": 0.0715,
+      "keel_z": -0.2341,
+      "deck_z": 0.4774,
+      "rail_z": 0.0,
+      "reflex_vertices": 0
+    },
+    {
+      "x": 1.8,
+      "half_beam": 0.3742,
+      "keel_half": 0.0524,
+      "keel_z": -0.2259,
+      "deck_z": 0.4877,
+      "rail_z": 0.0,
+      "reflex_vertices": 0
+    },
+    {
+      "x": 2.0,
+      "half_beam": 0.03,
+      "keel_half": 0.02,
+      "keel_z": -0.22,
+      "deck_z": 0.495,
+      "rail_z": 0.0,
+      "reflex_vertices": 0
+    }
+  ],
+  "blender": {
+    "vertices": 90,
+    "edges": 170,
+    "faces": 82,
+    "triangles": 176,
+    "boundary_edges": 0,
+    "nonmanifold_edges": 0,
+    "loose_vertices": 0,
+    "euler": 2,
+    "volume_signed": 2.8038327393272473,
+    "volume_face_terms": 2.8038327076868277,
+    "zero_area_faces": 0,
+    "inward_facing_faces": 0,
+    "inward_face_ids": [],
+    "normal_convention_mismatches": 0
+  },
+  "scene": {
+    "bbox": {
+      "x": [
+        -2.0,
+        2.0
+      ],
+      "y": [
+        -0.749343752861023,
+        0.749343752861023
+      ],
+      "z": [
+        -0.2800000011920929,
+        0.4950000047683716
+      ]
+    },
+    "size": {
+      "length": 4.0,
+      "beam": 1.498687505722046,
+      "height": 0.7750000059604645,
+      "draft": 0.2800000011920929,
+      "freeboard": 0.4950000047683716
+    }
+  },
+  "pure_python": {
+    "vertices": 90,
+    "faces": 82,
+    "quads": 80,
+    "ngons": 2,
+    "edges": 170,
+    "triangles_after_triangulation": 176,
+    "boundary_edges": 0,
+    "nonmanifold_edges": 0,
+    "euler_characteristic": 2,
+    "inconsistent_winding_edges": 0,
+    "zero_area_faces": 0,
+    "faces_with_repeated_vertex": 0,
+    "signed_volume_m3": 2.8038327703987136,
+    "mirror_asymmetry_m": 0.0,
+    "cap_planarity_m": 7.338108868156673e-15,
+    "inward_facing_faces": 0,
+    "face_term_volume_m3": 2.8038327703987136,
+    "coincident_vertices": 0,
+    "min_edge_m": 0.04,
+    "sections_monotonic_z": true,
+    "chine_count_per_station": [
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0
+    ],
+    "waterline_half_beam_m": [
+      0.03,
+      0.7097,
+      0.7436,
+      0.635,
+      0.03
+    ],
+    "midship_section_area_m2": 0.917401923815625,
+    "numeric_volume_m3": 3.0738761680523266,
+    "block_coefficient": 0.6610486382908228,
+    "prismatic_coefficient": 0.8376579796311009,
+    "bbox": {
+      "x": [
+        -2.0,
+        2.0
+      ],
+      "y": [
+        -0.7493437522529123,
+        0.7493437522529123
+      ],
+      "z": [
+        -0.28,
+        0.495
+      ]
+    },
+    "size": {
+      "length": 4.0,
+      "beam": 1.4986875045058246,
+      "height": 0.775,
+      "draft": 0.28,
+      "freeboard": 0.495
+    },
+    "problems": [],
+    "ok": true
+  },
+  "problems": [],
+  "ok": true
+}

@@ -1,59 +1,48 @@
-from minisim.ship import Ship
-from minisim.simulator import Simulator
-from minisim.render.plot2d import plot_trajectory, plot_state_history
-from minisim.control.command import ControlCommand
-from minisim.control.scripts import rudder_step_script, speed_step_script, rudder_s_turn_script, rudder_straight, target_speed_straight
+"""MiniShipSim 的统一启动入口。"""
 
-def run_offline_sim(dt, steps, rudder_script, speed_script):
-    
-    ship = Ship()
+import argparse
+from pathlib import Path
 
-    command = ControlCommand()
-    
-    sim = Simulator(ship)
-    
-    sim.record()
-    
-    for i in range(steps):
-        command.rudder = rudder_script(i)
-        command.target_speed = speed_script(i)
-        sim.step(dt, command)
-        
-    return sim
-        
-        
-def show_results(sim):
-    
-    for item in sim.history:
-        print(f"time = {item['time']:.1f}")
-        print(f"x = {item['x']:.3f}")
-        print(f"y = {item['y']:.3f}")
-        print(f"heading = {item['heading']:.3f}")
-        print(f"turn_rate = {item['turn_rate']:.3f}")
-        print(f"rudder = {item['rudder']:.3f}")
-        print(f"speed = {item['speed']:.3f}")
-        print()
-        
-    plot_trajectory(sim.history)
-    plot_state_history(sim.history)
-    
+from minisim.config import DEFAULT_OUTPUT_DIR, SimulationConfig
 
 
+def main(argv=None):
+    parser = argparse.ArgumentParser(description="运行 MiniShipSim 仿真实验")
+    parser.add_argument("mode", nargs="?", default="offline",
+                        choices=["offline", "compare", "keyboard"])
+    parser.add_argument("--dt", type=float, default=0.1,
+                        help="离线仿真的时间步长（秒）")
+    parser.add_argument("--steps", type=int, default=200,
+                        help="离线仿真的步数")
+    parser.add_argument("--output-dir", type=Path, default=DEFAULT_OUTPUT_DIR,
+                        help="输出根目录，各模式分别存入子目录")
+    parser.add_argument("--no-show", action="store_true",
+                        help="保存图片但不弹出绘图窗口")
+    parser.add_argument("--verbose", action="store_true",
+                        help="单次运行时打印每一步的状态")
+    args = parser.parse_args(argv)
 
-def main():
-    
+    if args.mode == "keyboard":
+        from minisim.interactive import main as run_keyboard
+        run_keyboard()
+        return
 
-    dt = 0.1
-    steps = 45
-    
-    sim = run_offline_sim(dt, steps, rudder_straight, target_speed_straight)
-    
-    show_results(sim)
-    
-    
+    try:
+        config = SimulationConfig(dt=args.dt, steps=args.steps)
+    except ValueError as error:
+        parser.error(str(error))
 
+    from minisim.experiments import compare_experiments, run_experiment
 
+    output_dir = args.output_dir / args.mode
+    if args.mode == "offline":
+        run_experiment(config, output_dir=output_dir,
+                       show=not args.no_show, verbose=args.verbose)
+    else:
+        compare_experiments(config, output_dir=output_dir,
+                            show=not args.no_show)
 
+    print(f"输出目录：{output_dir.resolve()}")
 
 
 if __name__ == "__main__":

@@ -5,6 +5,7 @@ MiniShipSim is a Python ship maneuvering simulation project that starts from a m
 At its current stage, the project focuses on building a runnable simulation core rather than a physically accurate ship model. It already supports:
 
 - an **offline scripted simulation** with matplotlib plots;
+- a **comparison workflow** with shared metrics and an overlaid trajectory plot;
 - a **pygame real-time keyboard demo** for interactive steering experiments.
 
 The long-term goal is to keep improving the structure, control flow, and physical modeling step by step, so that this project can gradually grow from a small prototype into a clearer ship maneuvering simulation framework.
@@ -33,9 +34,11 @@ In short: **the project is no longer just a single test script — it is becomin
   - `heading`
   - `turn_rate`
   - `rudder`
+  - `target_rudder`
   - `target_speed`
 - **Simplified ship dynamics** in `Ship.step(...)`
   - speed approaches `target_speed` through a first-order response;
+  - rudder approaches `target_rudder` through a first-order response;
   - turn rate evolves from rudder input with damping;
   - heading is integrated from turn rate;
   - position is integrated from speed and heading.
@@ -45,19 +48,23 @@ In short: **the project is no longer just a single test script — it is becomin
   - records simulation history over time.
 
 ### Offline Simulation
-- **Offline runner** in `main.py`
+- **Shared offline runner** in `minisim/experiments.py`, launched through `main.py`
 - **Scripted control inputs** in `minisim/control/scripts.py`
 - **Matplotlib output**
-  - `tra.png` — trajectory plot
-  - `state.png` — state history plot
+  - `outputs/offline/tra.png` — trajectory plot
+  - `outputs/offline/state.png` — state history plot
+- CSV history and summary in `outputs/offline/`
+- Comparison CSV and plot in `outputs/compare/`
 
 ### Real-Time Demo
-- **pygame keyboard demo** in `examples/realtime_keyboard.py`
-- Keyboard control of rudder and target speed
+- **pygame keyboard demo** in `minisim/interactive.py`
+- `examples/realtime_keyboard.py` is a compatibility entry point
+- Keyboard control of target rudder and target speed
 - Ship drawn as a triangle
 - Live trajectory trail
 - HUD showing:
   - current rudder
+  - current target rudder
   - current speed
   - current target speed
 
@@ -67,19 +74,27 @@ In short: **the project is no longer just a single test script — it is becomin
 
 ```text
 MiniShipSim/
-├── main.py                         # Offline simulation entry point
+├── main.py                         # Unified entry: offline / compare / keyboard
+├── compare_runs.py                 # Compatibility entry for comparison
 ├── requirements.txt
 ├── README.md
-├── data/                           # Reserved for future data/config files
+├── PLAN.md                         # Roadmap and module responsibilities
+├── 3d/first/                       # Existing Blender / OBJ hull assets
+├── outputs/                        # Generated CSVs and images (git-ignored)
 ├── examples/
-│   ├── realtime_keyboard.py        # Pygame real-time demo entry point
+│   ├── realtime_keyboard.py        # Compatibility entry for keyboard mode
 │   └── demo_turning.py             # Placeholder
 └── minisim/                        # Core package
     ├── __init__.py
     ├── state.py                    # ShipState dataclass
     ├── ship.py                     # Ship dynamics
     ├── simulator.py                # Simulation loop + history recording
-    ├── config.py                   # Reserved for future configuration
+    ├── config.py                   # dt / steps and default output location
+    ├── experiments.py              # Single-run and comparison workflows
+    ├── interactive.py              # Keyboard input and real-time window loop
+    ├── metrics.py                  # Pure metric calculation
+    ├── storage.py                  # CSV saving and output directory creation
+    ├── csv_export.py               # Compatibility import for CSV saving
     ├── control/
     │   ├── __init__.py
     │   ├── command.py              # ControlCommand dataclass
@@ -94,7 +109,7 @@ MiniShipSim/
     │   └── steering.py
     └── world/
         ├── __init__.py
-        └── environment.py          # Placeholder
+        └── environment.py          # Initial wave-height function; not coupled yet
 ```
 
 ---
@@ -125,19 +140,33 @@ python main.py
 
 What it currently does:
 1. runs a scripted offline simulation;
-2. prints recorded state history to the console;
-3. generates:
-   - `tra.png` — trajectory plot
-   - `state.png` — state history plot
+2. prints summary metrics;
+3. saves history, summary CSVs, and plots into `outputs/offline/`.
 
 At the moment, the default `main.py` setup runs:
 
 - `dt = 0.1`
-- `steps = 45`
-- `rudder_straight`
+- `steps = 200`
+- `rudder_s_turn`
 - `target_speed_straight`
 
-You can change the selected control scripts in `main.py` to try different offline experiments.
+The shared runner and default comparison cases live in `minisim/experiments.py`.
+`SimulationConfig` holds the time step and number of steps. `metrics.summary(history)`
+returns one dictionary; use `[result]` when exporting a one-row summary CSV.
+
+```bash
+python main.py offline --dt 0.1 --steps 200
+python main.py compare
+python main.py compare --no-show
+python main.py offline --verbose
+```
+
+`--no-show` saves plots without opening windows. `--output-dir PATH` chooses an
+output root; `offline/` and `compare/` subdirectories keep their files separate.
+Repeated runs overwrite files in the same output folder. To keep separate runs,
+choose a different output root, for example `--output-dir outputs/experiment_02`.
+The default output root is relative to the project, regardless of the current
+working directory. Old `python compare_runs.py` usage remains available.
 
 ---
 
@@ -146,18 +175,18 @@ You can change the selected control scripts in `main.py` to try different offlin
 From the repository root:
 
 ```bash
-python examples/realtime_keyboard.py
+python main.py keyboard
 ```
 
 ### Keyboard Controls
 
 | Key | Action |
 |---|---|
-| ← Left | Decrease rudder |
-| → Right | Increase rudder |
+| ← Left | Decrease target rudder |
+| → Right | Increase target rudder |
 | ↑ Up | Increase target speed |
 | ↓ Down | Decrease target speed |
-| No left/right input | Rudder gradually returns toward 0 |
+| No left/right input | Target rudder gradually returns toward 0 |
 
 The pygame window currently shows:
 - the ship as a triangle,
@@ -177,8 +206,9 @@ The repository root currently contains example output images generated by the of
 - `tra.png` — trajectory plot
 - `state.png` — state history plot
 
-These are **generated runtime outputs**, not source assets.  
-Running `main.py` may overwrite them.
+These are historical runtime outputs, not source assets. New runs save into
+`outputs/` and leave those existing root files alone. Hull assets remain under
+`3d/first/`; the OBJ loader and 2.5D wave views are planned, not implemented.
 
 ---
 
@@ -186,7 +216,8 @@ Running `main.py` may overwrite them.
 
 The current model is intentionally simple:
 
-- `rudder` acts as a control input;
+- `target_rudder` acts as a commanded rudder target;
+- `rudder` is a simulated response that gradually approaches `target_rudder`;
 - `target_speed` acts as a commanded speed target;
 - `speed` is a simulated response that gradually approaches `target_speed`;
 - `turn_rate`, `heading`, `x`, and `y` are evolved step by step from the current state.
@@ -201,8 +232,9 @@ MiniShipSim is still a prototype. Important limitations at the moment include:
 
 - The physics model is highly simplified and not intended to be physically accurate.
 - Command naming for target speed is now unified as `target_speed` across the control path.
-- `minisim/physics/`, `minisim/world/`, `minisim/config.py`, and `examples/demo_turning.py` are still placeholders.
-- Offline output images are still saved into the repository root.
+- `minisim/physics/` and `examples/demo_turning.py` are still placeholders.
+- The wave-height function is not connected to ship motion yet.
+- Scenario-file loading, replay and learning-environment adapters are still planned.
 - In plotting, control application time and recorded state time are not yet fully separated, so command transitions may appear slightly shifted.
 - The real-time pygame mode is a demo, not yet a full simulation application.
 
