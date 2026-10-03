@@ -1,4 +1,5 @@
 import matplotlib.pyplot as plt
+from matplotlib.animation import FuncAnimation
 from pathlib import Path
 import math
 from minisim.config import DEFAULT_OUTPUT_DIR
@@ -90,8 +91,7 @@ def plot_compare_trajs(runs, output_path=DEFAULT_OUTPUT_DIR / "compare" / "compa
 	plt.legend()
 	_finish_plot(output_path, show)
 
-def plot_hull_views(vertices, faces, output_path, show = True, pose = None, wave = None):
-	fig, axes = plt.subplots(1, 2, figsize = (10, 4))
+def _draw_hull_frame(axes, vertices, faces, pose=None, wave=None):
 	heave = 0.0 if pose is None else pose["z"]
 	pitch = 0.0 if pose is None else pose["pitch"]
 	roll = 0.0 if pose is None else pose["roll"]
@@ -145,7 +145,6 @@ def plot_hull_views(vertices, faces, output_path, show = True, pose = None, wave
 
 		axes[0].plot(water_xs_0, water_zs_0, color = 'c', linewidth = 0.4)
 		axes[1].plot(water_xs_1, water_zs_1, color = 'c', linewidth = 0.4)
-		fig.suptitle(f't = {pose["time"]:.1f} s')
 
 	axes[0].set_title("Side View")
 	axes[0].set_xlabel("x (m)")
@@ -159,5 +158,45 @@ def plot_hull_views(vertices, faces, output_path, show = True, pose = None, wave
 		ax.set_aspect("equal", adjustable="box")
 		ax.grid(True)
 
+
+def plot_hull_views(vertices, faces, output_path, show = True, pose = None, wave = None):
+	fig, axes = plt.subplots(1, 2, figsize = (10, 4))
+
+	_draw_hull_frame(axes, vertices, faces, pose, wave)
+
+	if pose is not None:
+		fig.suptitle(f't = {pose["time"]:.1f} s')
+
 	fig.tight_layout()
 	_finish_plot(output_path, show)
+
+def animate_hull_views(vertices, faces, history, wave = None):
+	if len(history) < 2:
+		raise ValueError("当前记录不足两条")
+
+	fig, axes = plt.subplots(1, 2, figsize = (10, 4))
+	interval_ms = (history[1]["time"] - history[0]["time"]) * 1000
+
+	radius = max(math.sqrt(x * x + y * y + z * z) for x, y, z in vertices)
+	heaves = [pose["z"] for pose in history]
+	margin = 0.2
+
+	horizontal_limit = radius + margin
+	zmin = min(heaves) - radius - margin
+	zmax = max(heaves) + radius + margin
+
+	def update(frame_index):
+		for ax in axes:
+			ax.clear()
+
+		pose = history[frame_index]
+		_draw_hull_frame(axes, vertices, faces, pose, wave)
+		for ax in axes:
+			ax.set_xlim(-horizontal_limit, horizontal_limit)
+			ax.set_ylim(zmin, zmax)
+		fig.suptitle(f't = {pose["time"]:.1f} s')
+
+	animation = FuncAnimation(fig, update, frames = len(history), interval = interval_ms, repeat = False)
+
+	fig.tight_layout()
+	plt.show()

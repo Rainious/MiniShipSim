@@ -1,6 +1,6 @@
 
 from minisim.config import DEFAULT_OUTPUT_DIR
-from minisim.render.plot2d import plot_hull_views
+from minisim.render.plot2d import plot_hull_views, animate_hull_views
 from minisim.world.environment import waveField
 from minisim.simulator import Simulator
 from minisim.ship import Ship
@@ -53,3 +53,6 @@ if __name__ == "__main__":
         pose = pose_b,
         wave = wave
     )
+
+    animate_hull_views(vertices, faces, sim.history, wave=wave)
+
